@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,10 +9,15 @@ import { Prisma, User } from '@prisma/client';
 
 import { PrismaService } from '../database';
 import { Login } from './auth.types';
+import { UsersService } from '../user/users.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService, private prisma: PrismaService) {}
+  constructor(
+    private jwtService: JwtService,
+    private prisma: PrismaService,
+    private userService: UsersService,
+  ) {}
 
   async validateUser(email: string, password: string): Promise<User> {
     const user: User = await this.prisma.user.findFirst({ where: { email } });
@@ -38,24 +42,9 @@ export class AuthService {
   }
 
   async signup(data: Prisma.UserCreateInput): Promise<Login> {
-    const existingUser = this.prisma.user.findFirst({
-      where: { email: data.email },
-    });
-
-    if (existingUser) {
-      throw new ConflictException('email already exists');
-    }
-
-    const password = await bcrypt.hash(
-      data.password,
-      Number(process.env.BCRYPT_SALT_OR_ROUNDS),
-    );
-
-    const user = await this.prisma.user.create({
-      data: {
-        ...data,
-        password,
-      },
+    const user = await this.userService.createUser({
+      ...data,
+      isSuperAdmin: true,
     });
 
     return this.login(user);
