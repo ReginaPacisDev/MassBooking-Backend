@@ -16,3 +16,17 @@ model User {
   updatedAt     DateTime @default(now())
   isSuperAdmin  Boolean? @default(false)
 }
+
+model Booking {
+  id            Int     @default(autoincrement()) @id
+  name            String
+  email           String
+  startDate       Int
+  endDate         Int
+  amountPaid      Decimal
+  massIntention   String
+  phoneNumber     String
+  bookedBy        String
+  uniqueBookingID String
+  createdAt       DateTime @default(now())
+}
