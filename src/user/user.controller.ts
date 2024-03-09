@@ -36,6 +36,6 @@ export class UsersController {
     @Param('id') id: number,
     @Body() body: UpdateUserDto,
   ): Promise<void> {
-    return this.userService.updateUser(id, body);
+    return this.userService.updateUser(Number(id), body);
   }
 }
