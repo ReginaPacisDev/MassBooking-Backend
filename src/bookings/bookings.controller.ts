@@ -19,8 +19,8 @@ export class BookingsController {
   }
 
   @Get('/')
-  async getBookings(@Query('skip') skip: number): Promise<Booking[]> {
-    return await this.bookingsService.getBookings(skip);
+  async getBookings(@Query('skip') skip: string): Promise<Booking[]> {
+    return await this.bookingsService.getBookings(Number(skip));
   }
 
   @Get('/latest-bookings')
