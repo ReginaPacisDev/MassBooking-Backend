@@ -38,7 +38,11 @@ export class AuthService {
   async login(user: User): Promise<Login> {
     const payload = { email: user.email, id: user.id };
 
-    return { accessToken: this.jwtService.sign(payload) };
+    return {
+      accessToken: this.jwtService.sign(payload),
+      email: user.email,
+      name: user.name,
+    };
   }
 
   async signup(data: Prisma.UserCreateInput): Promise<Login> {
