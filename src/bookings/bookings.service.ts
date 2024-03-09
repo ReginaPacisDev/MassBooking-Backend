@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { Booking as PrismaBooking } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../database';
 import {
   Booking,
+  BookingsResponse,
   CreateBookingResponse,
   Stats,
   TotalMassesBooked,
@@ -38,20 +39,34 @@ export class BookingsService {
     };
   }
 
-  async getBookings(skip: number, take = 20): Promise<PrismaBooking[]> {
-    return await this.prisma.booking.findMany({
+  async getBookings(skip: string, take = '20'): Promise<BookingsResponse> {
+    const normalizedSkip = Number(skip);
+    const normalizedTake = Number(take);
+
+    const bookings = await this.prisma.booking.findMany({
       orderBy: [
         {
           createdAt: 'desc',
         },
       ],
-      skip,
-      take,
+      skip: normalizedSkip,
+      take: normalizedTake,
     });
+
+    const count = await this.getBookingsCount();
+
+    return {
+      bookings,
+      total: count,
+      skip: normalizedSkip,
+      take: normalizedTake,
+    };
   }
 
-  async getFiveLatestBookings(): Promise<PrismaBooking[]> {
-    return await this.getBookings(0, 5);
+  async getBookingsCount(where?: Prisma.BookingWhereInput): Promise<number> {
+    const count = await this.prisma.booking.count({ where });
+
+    return count;
   }
 
   async getBookingsStats(range: RangeTypes): Promise<Stats> {

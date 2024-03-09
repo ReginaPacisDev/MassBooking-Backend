@@ -1,10 +1,13 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { Booking } from '@prisma/client';
 
 import { Public } from '../auth';
 import { BookingsService } from './bookings.service';
 import { CreateBookingsDto } from './dto';
-import { CreateBookingResponse, Stats } from './bookings.type';
+import {
+  BookingsResponse,
+  CreateBookingResponse,
+  Stats,
+} from './bookings.type';
 
 @Controller('bookings')
 export class BookingsController {
@@ -19,13 +22,11 @@ export class BookingsController {
   }
 
   @Get('/')
-  async getBookings(@Query('skip') skip: string): Promise<Booking[]> {
-    return await this.bookingsService.getBookings(Number(skip));
-  }
-
-  @Get('/latest-bookings')
-  async getLatestBookings(): Promise<Booking[]> {
-    return this.bookingsService.getFiveLatestBookings();
+  async getBookings(
+    @Query('skip') skip: string,
+    @Query('limit') limit?: string,
+  ): Promise<BookingsResponse> {
+    return await this.bookingsService.getBookings(skip, limit);
   }
 
   @Get('/stats')

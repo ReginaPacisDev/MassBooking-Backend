@@ -1,3 +1,5 @@
+import { Booking as PrismaBooking } from '@prisma/client';
+
 export interface Booking {
   name: string;
   email: string;
@@ -28,4 +30,11 @@ export interface Stats {
   totalAmountPaidThisPeriod: number;
   totalMassesBookedThisPeriod: number;
   bookings: TotalMassesBooked[];
+}
+
+export interface BookingsResponse {
+  bookings: PrismaBooking[];
+  total: number;
+  skip: number;
+  take: number;
 }
