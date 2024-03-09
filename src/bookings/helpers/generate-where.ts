@@ -1,4 +1,4 @@
-import moment from 'moment';
+import * as moment from 'moment';
 
 export interface RangeTypes {
   startDate?: number;
@@ -29,7 +29,7 @@ export const generateWhereClause = ({
         lte: moment().endOf(type).startOf('day').utc(true).unix(),
       },
       endDate: {
-        gtw: moment().startOf(type).startOf('day').utc(true).unix(),
+        gte: moment().startOf(type).startOf('day').utc(true).unix(),
       },
     }),
     ...(date && {
