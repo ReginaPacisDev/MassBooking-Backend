@@ -13,12 +13,12 @@ export class UsersController {
     return await this.userService.adminCreateUser(body);
   }
 
-  @Get('send-password-reset-link')
+  @Get('send-password-reset-link/:email')
   async sendPasswordResetLink(@Param('email') email: string): Promise<void> {
     return this.userService.sendPasswordResetLink(email);
   }
 
-  @Put('reset-password')
+  @Put('reset-password/:email')
   async resetPassword(
     @Param('email') email: string,
     @Body() body: ResetPasswordDto,
