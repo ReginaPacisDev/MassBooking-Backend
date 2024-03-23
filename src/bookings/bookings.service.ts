@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { Prisma } from '@prisma/client';
+import { Booking as PrismaBooking } from '@prisma/client';
 
 import { PrismaService } from '../database';
 import {
@@ -64,6 +65,20 @@ export class BookingsService {
       bookings,
       total: count,
     };
+  }
+
+  async getBooking(id: string): Promise<PrismaBooking> {
+    const booking = await this.prisma.booking.findFirst({
+      where: {
+        id: Number(id),
+      },
+    });
+
+    if (!booking) {
+      throw new NotFoundException('Booking not found');
+    }
+
+    return booking;
   }
 
   async getBookingsCount(where?: Prisma.BookingWhereInput): Promise<number> {

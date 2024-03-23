@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Booking as PrismaBooking } from '@prisma/client';
 
 import { Public } from '../auth';
 import { BookingsService } from './bookings.service';
@@ -40,6 +41,11 @@ export class BookingsController {
       date,
       name,
     });
+  }
+
+  @Get(':id')
+  async getBooking(@Param('id') id: string): Promise<PrismaBooking> {
+    return await this.bookingsService.getBooking(id);
   }
 
   @Get('/stats')
