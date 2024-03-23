@@ -29,6 +29,7 @@ export class BookingsController {
     @Query('endDate') endDate?: number,
     @Query('type') type?: string,
     @Query('date') date?: number,
+    @Query('name') name?: string,
   ): Promise<BookingsResponse> {
     return await this.bookingsService.getBookings({
       skip,
@@ -37,6 +38,7 @@ export class BookingsController {
       endDate,
       type,
       date,
+      name,
     });
   }
 

@@ -5,6 +5,7 @@ export interface RangeTypes {
   endDate?: number;
   date?: number;
   type?: any;
+  name?: string;
 }
 
 export const generateWhereClause = ({
@@ -12,6 +13,7 @@ export const generateWhereClause = ({
   endDate,
   type,
   date,
+  name,
 }: RangeTypes) => {
   const format = 'DD-MM-YYYY';
 
@@ -39,6 +41,16 @@ export const generateWhereClause = ({
       endDate: {
         gte: moment(date, format).startOf('day').utc(true).unix(),
       },
+    }),
+    ...(name && {
+      OR: [
+        {
+          name,
+        },
+        {
+          bookedBy: name,
+        },
+      ],
     }),
   };
 };
