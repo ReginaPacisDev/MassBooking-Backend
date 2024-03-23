@@ -23,10 +23,21 @@ export class BookingsController {
 
   @Get('/')
   async getBookings(
-    @Query('skip') skip: string,
+    @Query('skip') skip?: string,
     @Query('limit') limit?: string,
+    @Query('startDate') startDate?: number,
+    @Query('endDate') endDate?: number,
+    @Query('type') type?: string,
+    @Query('date') date?: number,
   ): Promise<BookingsResponse> {
-    return await this.bookingsService.getBookings(skip, limit);
+    return await this.bookingsService.getBookings({
+      skip,
+      take: limit,
+      startDate,
+      endDate,
+      type,
+      date,
+    });
   }
 
   @Get('/stats')

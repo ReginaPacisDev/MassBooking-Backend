@@ -1,4 +1,5 @@
 import { Booking as PrismaBooking } from '@prisma/client';
+import { RangeTypes } from './helpers';
 
 export interface Booking {
   name: string;
@@ -35,6 +36,9 @@ export interface Stats {
 export interface BookingsResponse {
   bookings: PrismaBooking[];
   total: number;
-  skip: number;
-  take: number;
+}
+
+export interface GetBookings extends RangeTypes {
+  skip?: string;
+  take?: string;
 }

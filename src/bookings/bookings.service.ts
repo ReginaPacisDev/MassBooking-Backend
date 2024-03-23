@@ -7,6 +7,7 @@ import {
   Booking,
   BookingsResponse,
   CreateBookingResponse,
+  GetBookings,
   Stats,
   TotalMassesBooked,
 } from './bookings.type';
@@ -39,9 +40,8 @@ export class BookingsService {
     };
   }
 
-  async getBookings(skip: string, take = '20'): Promise<BookingsResponse> {
-    const normalizedSkip = Number(skip);
-    const normalizedTake = Number(take);
+  async getBookings(params: GetBookings): Promise<BookingsResponse> {
+    const { skip, take, ...restOfParams } = params;
 
     const bookings = await this.prisma.booking.findMany({
       orderBy: [
@@ -49,17 +49,20 @@ export class BookingsService {
           createdAt: 'desc',
         },
       ],
-      skip: normalizedSkip,
-      take: normalizedTake,
+      where: {
+        ...generateWhereClause(restOfParams),
+      },
+      ...(skip && { skip: Number(skip) }),
+      ...(take && { take: Number(take) }),
     });
 
-    const count = await this.getBookingsCount();
+    const count = await this.getBookingsCount(
+      generateWhereClause(restOfParams),
+    );
 
     return {
       bookings,
       total: count,
-      skip: normalizedSkip,
-      take: normalizedTake,
     };
   }
 
