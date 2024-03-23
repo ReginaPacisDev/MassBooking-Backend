@@ -45,10 +45,14 @@ export const generateWhereClause = ({
     ...(name && {
       OR: [
         {
-          name,
+          name: {
+            contains: name,
+          },
         },
         {
-          bookedBy: name,
+          bookedBy: {
+            contains: name,
+          },
         },
       ],
     }),
