@@ -3,6 +3,7 @@ import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { AdminCreateUserDto, ResetPasswordDto, UpdateUserDto } from './dto';
 import { UsersService } from './users.service';
 import { User } from './user.types';
+import { Public } from '../auth/decorators';
 
 @Controller('users')
 export class UsersController {
@@ -13,11 +14,13 @@ export class UsersController {
     return await this.userService.adminCreateUser(body);
   }
 
+  @Public()
   @Get('send-password-reset-link/:email')
   async sendPasswordResetLink(@Param('email') email: string): Promise<void> {
     return this.userService.sendPasswordResetLink(email);
   }
 
+  @Public()
   @Put('reset-password/:email')
   async resetPassword(
     @Param('email') email: string,
