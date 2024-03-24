@@ -128,17 +128,21 @@ export class BookingsService {
       group: [uniqueBookingID],
     });
 
+    const totalBookingsForPeriod = await this.bookingRepository.count({
+      where: {
+        ...generateSequelizeWhereClause(restOfParams),
+      },
+    });
+
     const statData = await this.bookingRepository.findOne({
       attributes: [[fn('SUM', col('amountPaid')), 'totalAmountPaid']],
       raw: true,
     });
 
     let totalAmountPaidForPeriod = 0;
-    let totalBookingsForPeriod = 0;
 
     bookings.forEach((booking) => {
       totalAmountPaidForPeriod += Number(booking.amountPaid);
-      totalBookingsForPeriod += booking.totalMassesBooked;
     });
 
     return {
