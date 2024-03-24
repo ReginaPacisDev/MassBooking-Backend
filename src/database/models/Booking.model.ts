@@ -6,6 +6,7 @@ export class Booking extends Model {
     type: DataType.BIGINT,
     allowNull: false,
     autoIncrement: true,
+    primaryKey: true,
   })
   id: number;
 

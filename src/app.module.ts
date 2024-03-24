@@ -4,6 +4,7 @@ import { AuthModule, JwtGuard } from './auth';
 import { APP_GUARD } from '@nestjs/core';
 import { UsersModule } from './user/users.module';
 import { BookingsModule } from './bookings/bookings.module';
+import { SequelizeDatabaseModule } from './database';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { BookingsModule } from './bookings/bookings.module';
     AuthModule,
     UsersModule,
     BookingsModule,
+    SequelizeDatabaseModule,
   ],
   providers: [
     {
