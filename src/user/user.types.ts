@@ -1,5 +1,4 @@
 export interface AdminCreateUser {
-  name: string;
   email: string;
 }
 

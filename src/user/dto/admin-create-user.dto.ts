@@ -4,8 +4,4 @@ export class AdminCreateUserDto {
   @IsNotEmpty()
   @IsString()
   email: string;
-
-  @IsNotEmpty()
-  @IsString()
-  name: string;
 }
