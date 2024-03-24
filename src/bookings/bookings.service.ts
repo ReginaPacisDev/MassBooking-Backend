@@ -16,38 +16,37 @@ import {
 } from './bookings.type';
 import { RangeTypes, generateWhereClause } from './helpers';
 
-const generateSequelizeWhereClause = ({
-  startDate,
-  endDate,
-  type,
-  date,
-}: RangeTypes) => {
+const generateSequelizeWhereClause = ({ type, date }: RangeTypes) => {
   const format = 'DD-MM-YYYY';
 
   return {
-    ...(startDate && {
-      startDate: {
-        [Op.lte]: moment(endDate, format).startOf('day').utc(true).unix(),
-      },
-      endDate: {
-        [Op.gte]: moment(startDate, format).startOf('day').utc(true).unix(),
-      },
-    }),
     ...(type && {
-      startDate: {
-        [Op.lte]: moment().endOf(type).startOf('day').utc(true).unix(),
-      },
-      endDate: {
-        [Op.gte]: moment().startOf(type).startOf('day').utc(true).unix(),
-      },
+      [Op.and]: [
+        {
+          createdAt: {
+            [Op.gte]: moment().startOf(type).startOf('day').utc(true),
+          },
+        },
+        {
+          createdAt: {
+            [Op.lte]: moment().endOf(type).endOf('day').utc(true),
+          },
+        },
+      ],
     }),
     ...(date && {
-      startDate: {
-        [Op.lte]: moment(date, format).endOf('day').utc(true).unix(),
-      },
-      endDate: {
-        [Op.gte]: moment(date, format).startOf('day').utc(true).unix(),
-      },
+      [Op.and]: [
+        {
+          createdAt: {
+            [Op.gte]: moment(date, format).startOf('day').utc(true),
+          },
+        },
+        {
+          createdAt: {
+            [Op.lte]: moment(date, format).endOf('day').utc(true),
+          },
+        },
+      ],
     }),
   };
 };
@@ -155,6 +154,7 @@ export class BookingsService {
       ...(skip && { offset: Number(skip) }),
       ...(take && { limit: Number(take) }),
       group: [uniqueBookingID],
+      raw: true,
     });
 
     const total = await this.bookingRepository.count({
@@ -173,10 +173,8 @@ export class BookingsService {
     let totalBookingsForPeriod = 0;
 
     bookings.forEach((booking) => {
-      const normalizedBooking = booking.toJSON();
-
-      totalAmountPaidForPeriod += Number(normalizedBooking.amountPaid);
-      totalBookingsForPeriod += normalizedBooking.totalMassesBooked;
+      totalAmountPaidForPeriod += Number(booking.amountPaid);
+      totalBookingsForPeriod += booking.totalMassesBooked;
     });
 
     return {

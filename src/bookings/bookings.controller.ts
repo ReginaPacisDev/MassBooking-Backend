@@ -28,12 +28,16 @@ export class BookingsController {
     @Query('endDate') endDate?: number,
     @Query('type') type?: string,
     @Query('date') date?: number,
+    @Query('skip') skip?: string,
+    @Query('limit') limit?: string,
   ): Promise<Stats> {
     return this.bookingsService.getBookingsStats({
       startDate,
       endDate,
       type,
       date,
+      skip,
+      take: limit,
     });
   }
 
