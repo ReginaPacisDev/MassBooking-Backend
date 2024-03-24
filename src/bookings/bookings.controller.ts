@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { Booking as PrismaBooking } from '@prisma/client';
+import { Bookings as PrismaBooking } from '@prisma/client';
 
 import { Public } from '../auth';
 import { BookingsService } from './bookings.service';
@@ -20,6 +20,21 @@ export class BookingsController {
     @Body() { bookings }: CreateBookingsDto,
   ): Promise<CreateBookingResponse> {
     return await this.bookingsService.createBooking(bookings);
+  }
+
+  @Get('/stats')
+  async getBookingsStats(
+    @Query('startDate') startDate?: number,
+    @Query('endDate') endDate?: number,
+    @Query('type') type?: string,
+    @Query('date') date?: number,
+  ): Promise<Stats> {
+    return this.bookingsService.getBookingsStats({
+      startDate,
+      endDate,
+      type,
+      date,
+    });
   }
 
   @Get('/')
@@ -46,20 +61,5 @@ export class BookingsController {
   @Get(':id')
   async getBooking(@Param('id') id: string): Promise<PrismaBooking> {
     return await this.bookingsService.getBooking(id);
-  }
-
-  @Get('/stats')
-  async getBookingsStats(
-    @Query('startDate') startDate?: number,
-    @Query('endDate') endDate?: number,
-    @Query('type') type?: string,
-    @Query('date') date?: number,
-  ): Promise<Stats> {
-    return this.bookingsService.getBookingsStats({
-      startDate,
-      endDate,
-      type,
-      date,
-    });
   }
 }

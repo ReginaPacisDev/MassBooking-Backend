@@ -1,4 +1,4 @@
-import { Booking as PrismaBooking } from '@prisma/client';
+import { Bookings as PrismaBooking } from '@prisma/client';
 import { Booking as SequelizeBooking } from '../database';
 import { RangeTypes } from './helpers';
 

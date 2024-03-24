@@ -1,8 +1,9 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { Prisma } from '@prisma/client';
-import { Booking as PrismaBooking } from '@prisma/client';
-import { literal, fn, col, ProjectionAlias } from 'sequelize';
+import { Bookings as PrismaBooking } from '@prisma/client';
+import { literal, fn, col, ProjectionAlias, Op } from 'sequelize';
+import * as moment from 'moment';
 
 import { Booking as SequelizeBooking, PrismaService } from '../database';
 import {
@@ -13,7 +14,43 @@ import {
   GetBookings,
   Stats,
 } from './bookings.type';
-import { generateWhereClause } from './helpers';
+import { RangeTypes, generateWhereClause } from './helpers';
+
+const generateSequelizeWhereClause = ({
+  startDate,
+  endDate,
+  type,
+  date,
+}: RangeTypes) => {
+  const format = 'DD-MM-YYYY';
+
+  return {
+    ...(startDate && {
+      startDate: {
+        [Op.lte]: moment(endDate, format).startOf('day').utc(true).unix(),
+      },
+      endDate: {
+        [Op.gte]: moment(startDate, format).startOf('day').utc(true).unix(),
+      },
+    }),
+    ...(type && {
+      startDate: {
+        [Op.lte]: moment().endOf(type).startOf('day').utc(true).unix(),
+      },
+      endDate: {
+        [Op.gte]: moment().startOf(type).startOf('day').utc(true).unix(),
+      },
+    }),
+    ...(date && {
+      startDate: {
+        [Op.lte]: moment(date, format).endOf('day').utc(true).unix(),
+      },
+      endDate: {
+        [Op.gte]: moment(date, format).startOf('day').utc(true).unix(),
+      },
+    }),
+  };
+};
 
 @Injectable()
 export class BookingsService {
@@ -36,7 +73,7 @@ export class BookingsService {
       uniqueBookingID,
     }));
 
-    await this.prisma.booking.createMany({ data: normalizedBookings });
+    await this.prisma.bookings.createMany({ data: normalizedBookings });
 
     return {
       amountPaid: totalAmountPaid,
@@ -49,7 +86,7 @@ export class BookingsService {
   async getBookings(params: GetBookings): Promise<BookingsResponse> {
     const { skip, take, ...restOfParams } = params;
 
-    const bookings = await this.prisma.booking.findMany({
+    const bookings = await this.prisma.bookings.findMany({
       orderBy: [
         {
           createdAt: 'desc',
@@ -73,7 +110,7 @@ export class BookingsService {
   }
 
   async getBooking(id: string): Promise<PrismaBooking> {
-    const booking = await this.prisma.booking.findFirst({
+    const booking = await this.prisma.bookings.findFirst({
       where: {
         id: Number(id),
       },
@@ -86,8 +123,8 @@ export class BookingsService {
     return booking;
   }
 
-  async getBookingsCount(where?: Prisma.BookingWhereInput): Promise<number> {
-    const count = await this.prisma.booking.count({ where });
+  async getBookingsCount(where?: Prisma.BookingsWhereInput): Promise<number> {
+    const count = await this.prisma.bookings.count({ where });
 
     return count;
   }
@@ -97,7 +134,7 @@ export class BookingsService {
 
     const {
       bookedBy: { field: bookedBy },
-      uniqueBookingId: { field: uniqueBookingId },
+      uniqueBookingID: { field: uniqueBookingID },
     } = SequelizeBooking.getAttributes();
 
     const amountPaid: ProjectionAlias = [
@@ -113,18 +150,18 @@ export class BookingsService {
     const bookings = await this.bookingRepository.findAll({
       attributes: [bookedBy, amountPaid, totalMassesBooked],
       where: {
-        ...generateWhereClause(restOfParams),
+        ...generateSequelizeWhereClause(restOfParams),
       },
       ...(skip && { offset: Number(skip) }),
       ...(take && { limit: Number(take) }),
-      group: [uniqueBookingId],
+      group: [uniqueBookingID],
     });
 
     const total = await this.bookingRepository.count({
       where: {
-        ...generateWhereClause(restOfParams),
+        ...generateSequelizeWhereClause(restOfParams),
       },
-      group: [uniqueBookingId],
+      group: [uniqueBookingID],
     });
 
     const statData = await this.bookingRepository.findOne({

@@ -17,7 +17,7 @@ model User {
   isSuperAdmin  Boolean? @default(false)
 }
 
-model Booking {
+model Bookings {
   id            Int     @default(autoincrement()) @id
   name            String
   email           String
