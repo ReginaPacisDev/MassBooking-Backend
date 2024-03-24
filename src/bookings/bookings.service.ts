@@ -2,8 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { Prisma } from '@prisma/client';
 import { Bookings as PrismaBooking } from '@prisma/client';
-import { literal, fn, col, ProjectionAlias, Op } from 'sequelize';
-import * as moment from 'moment';
+import { literal, fn, col, ProjectionAlias } from 'sequelize';
 
 import { Booking as SequelizeBooking, PrismaService } from '../database';
 import {
@@ -14,42 +13,7 @@ import {
   GetBookings,
   Stats,
 } from './bookings.type';
-import { RangeTypes, generateWhereClause } from './helpers';
-
-const generateSequelizeWhereClause = ({ type, date }: RangeTypes) => {
-  const format = 'DD-MM-YYYY';
-
-  return {
-    ...(type && {
-      [Op.and]: [
-        {
-          createdAt: {
-            [Op.gte]: moment().startOf(type).startOf('day').utc(true),
-          },
-        },
-        {
-          createdAt: {
-            [Op.lte]: moment().endOf(type).endOf('day').utc(true),
-          },
-        },
-      ],
-    }),
-    ...(date && {
-      [Op.and]: [
-        {
-          createdAt: {
-            [Op.gte]: moment(date, format).startOf('day').utc(true),
-          },
-        },
-        {
-          createdAt: {
-            [Op.lte]: moment(date, format).endOf('day').utc(true),
-          },
-        },
-      ],
-    }),
-  };
-};
+import { generateWhereClause, generateSequelizeWhereClause } from './helpers';
 
 @Injectable()
 export class BookingsService {
