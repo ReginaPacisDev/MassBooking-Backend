@@ -94,14 +94,6 @@ export class BookingsService {
       },
     });
 
-    const uniqueBookingIDs = await this.prisma.booking.groupBy({
-      by: ['uniqueBookingID'],
-    });
-
-    const normalizedUniqueBookingIDs = uniqueBookingIDs.map(
-      ({ uniqueBookingID }) => uniqueBookingID,
-    );
-
     const bookings = await this.prisma.booking.findMany({
       select: {
         amountPaid: true,
@@ -110,9 +102,12 @@ export class BookingsService {
       },
       where: {
         ...generateWhereClause(range),
-        uniqueBookingID: {
-          in: normalizedUniqueBookingIDs,
-        },
+      },
+    });
+
+    const total = await this.prisma.booking.count({
+      where: {
+        ...generateWhereClause(range),
       },
     });
 
@@ -143,6 +138,7 @@ export class BookingsService {
       totalAmountPaidThisPeriod,
       totalMassesBookedThisPeriod,
       bookings: Object.values(bookingsPerUniqueId || {}),
+      total,
     };
   }
 }

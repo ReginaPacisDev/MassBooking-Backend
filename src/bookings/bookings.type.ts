@@ -31,6 +31,7 @@ export interface Stats {
   totalAmountPaidThisPeriod: number;
   totalMassesBookedThisPeriod: number;
   bookings: TotalMassesBooked[];
+  total: number;
 }
 
 export interface BookingsResponse {
