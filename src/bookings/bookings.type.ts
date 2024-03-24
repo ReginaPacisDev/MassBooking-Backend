@@ -1,4 +1,5 @@
 import { Booking as PrismaBooking } from '@prisma/client';
+import { Booking as SequelizeBooking } from '../database';
 import { RangeTypes } from './helpers';
 
 export interface Booking {
@@ -19,18 +20,11 @@ export interface CreateBookingResponse {
   email: string;
 }
 
-export interface TotalMassesBooked {
-  amountPaid: number;
-  uniqueBookingID: string;
-  bookedBy: string;
-  totalMassesBooked: number;
-}
-
 export interface Stats {
   totalAmountPaid: number;
-  totalAmountPaidThisPeriod: number;
-  totalMassesBookedThisPeriod: number;
-  bookings: TotalMassesBooked[];
+  totalAmountPaidForPeriod: number;
+  totalBookingsForPeriod: number;
+  bookings: SequelizeBooking[];
   total: number;
 }
 
@@ -43,3 +37,5 @@ export interface GetBookings extends RangeTypes {
   skip?: string;
   take?: string;
 }
+
+export const BOOKINGS_REPOSITORY = 'BOOKINGS_REPOSITORY';

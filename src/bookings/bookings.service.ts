@@ -1,22 +1,27 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { Prisma } from '@prisma/client';
 import { Booking as PrismaBooking } from '@prisma/client';
+import { literal, fn, col, ProjectionAlias } from 'sequelize';
 
-import { PrismaService } from '../database';
+import { Booking as SequelizeBooking, PrismaService } from '../database';
 import {
+  BOOKINGS_REPOSITORY,
   Booking,
   BookingsResponse,
   CreateBookingResponse,
   GetBookings,
   Stats,
-  TotalMassesBooked,
 } from './bookings.type';
-import { RangeTypes, generateWhereClause } from './helpers';
+import { generateWhereClause } from './helpers';
 
 @Injectable()
 export class BookingsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(BOOKINGS_REPOSITORY)
+    private bookingRepository: typeof SequelizeBooking,
+  ) {}
 
   async createBooking(bookings: Booking[]): Promise<CreateBookingResponse> {
     const totalAmountPaid = bookings.reduce(
@@ -87,58 +92,62 @@ export class BookingsService {
     return count;
   }
 
-  async getBookingsStats(range: RangeTypes): Promise<Stats> {
-    const totalAmountPaid = await this.prisma.booking.aggregate({
-      _sum: {
-        amountPaid: true,
-      },
-    });
+  async getBookingsStats(params: GetBookings): Promise<Stats> {
+    const { skip, take, ...restOfParams } = params;
 
-    const bookings = await this.prisma.booking.findMany({
-      select: {
-        amountPaid: true,
-        uniqueBookingID: true,
-        bookedBy: true,
-      },
+    const {
+      bookedBy: { field: bookedBy },
+      uniqueBookingId: { field: uniqueBookingId },
+    } = SequelizeBooking.getAttributes();
+
+    const amountPaid: ProjectionAlias = [
+      literal(`SUM(amountPaid)`),
+      'amountPaid',
+    ];
+
+    const totalMassesBooked: ProjectionAlias = [
+      literal(`COUNT(*)`),
+      'totalMassesBooked',
+    ];
+
+    const bookings = await this.bookingRepository.findAll({
+      attributes: [bookedBy, amountPaid, totalMassesBooked],
       where: {
-        ...generateWhereClause(range),
+        ...generateWhereClause(restOfParams),
       },
+      ...(skip && { offset: Number(skip) }),
+      ...(take && { limit: Number(take) }),
+      group: [uniqueBookingId],
     });
 
-    const total = await this.prisma.booking.count({
+    const total = await this.bookingRepository.count({
       where: {
-        ...generateWhereClause(range),
+        ...generateWhereClause(restOfParams),
       },
+      group: [uniqueBookingId],
     });
 
-    let totalAmountPaidThisPeriod = 0;
-    let totalMassesBookedThisPeriod = 0;
-    let bookingsPerUniqueId: Record<string, TotalMassesBooked>;
+    const statData = await this.bookingRepository.findOne({
+      attributes: [[fn('SUM', col('amountPaid')), 'totalAmountPaid']],
+      raw: true,
+    });
 
-    for (const booking of bookings) {
-      const amountPaid = Number(booking.amountPaid);
+    let totalAmountPaidForPeriod = 0;
+    let totalBookingsForPeriod = 0;
 
-      totalAmountPaidThisPeriod += amountPaid;
-      totalMassesBookedThisPeriod += 1;
+    bookings.forEach((booking) => {
+      const normalizedBooking = booking.toJSON();
 
-      if (!bookingsPerUniqueId[booking.uniqueBookingID]) {
-        bookingsPerUniqueId[booking.uniqueBookingID] = {
-          ...booking,
-          amountPaid,
-          totalMassesBooked: 1,
-        };
-      } else {
-        bookingsPerUniqueId[booking.uniqueBookingID].totalMassesBooked += 1;
-        bookingsPerUniqueId[booking.uniqueBookingID].amountPaid += amountPaid;
-      }
-    }
+      totalAmountPaidForPeriod += Number(normalizedBooking.amountPaid);
+      totalBookingsForPeriod += normalizedBooking.totalMassesBooked;
+    });
 
     return {
-      totalAmountPaid: Number(totalAmountPaid._sum.amountPaid),
-      totalAmountPaidThisPeriod,
-      totalMassesBookedThisPeriod,
-      bookings: Object.values(bookingsPerUniqueId || {}),
-      total,
+      totalAmountPaid: statData.totalAmountPaid || 0,
+      totalAmountPaidForPeriod,
+      totalBookingsForPeriod,
+      bookings,
+      total: total.length,
     };
   }
 }
