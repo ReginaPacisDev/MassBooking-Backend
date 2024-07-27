@@ -28,5 +28,6 @@ model Bookings {
   phoneNumber     String
   bookedBy        String
   uniqueBookingID String
+  mass            String
   createdAt       DateTime @default(now())
 }

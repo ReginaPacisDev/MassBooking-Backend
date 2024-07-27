@@ -11,6 +11,7 @@ export interface Booking {
   massIntention: string;
   phoneNumber: string;
   bookedBy: string;
+  mass: string;
 }
 
 export interface CreateBookingResponse {

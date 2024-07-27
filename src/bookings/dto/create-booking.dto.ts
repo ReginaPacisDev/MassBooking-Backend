@@ -40,6 +40,10 @@ class CreateBookingDto {
   @IsNotEmpty()
   @IsString()
   bookedBy: string;
+
+  @IsNotEmpty()
+  @IsString()
+  mass: string;
 }
 
 export class CreateBookingsDto {

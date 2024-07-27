@@ -70,6 +70,12 @@ export class Booking extends Model {
   })
   createdAt: Date;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  mass: string;
+
   totalAmountPaid?: number;
 
   totalMassesBooked?: number;
