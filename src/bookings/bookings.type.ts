@@ -11,7 +11,8 @@ export interface Booking {
   massIntention: string;
   phoneNumber: string;
   bookedBy: string;
-  mass: string;
+  weekdayMassTime: string;
+  sundayMassTime: string;
 }
 
 export interface CreateBookingResponse {

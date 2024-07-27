@@ -43,7 +43,11 @@ class CreateBookingDto {
 
   @IsNotEmpty()
   @IsString()
-  mass: string;
+  sundayMassTime: string;
+
+  @IsNotEmpty()
+  @IsString()
+  weekdayMassTime: string;
 }
 
 export class CreateBookingsDto {

@@ -28,6 +28,7 @@ model Bookings {
   phoneNumber     String
   bookedBy        String
   uniqueBookingID String
-  mass            String
+  sundayMassTime  String?
+  weekdayMassTime String?
   createdAt       DateTime @default(now())
 }

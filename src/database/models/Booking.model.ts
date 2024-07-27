@@ -74,7 +74,13 @@ export class Booking extends Model {
     type: DataType.STRING,
     allowNull: false,
   })
-  mass: string;
+  sundayMassTime: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  weekdayMassTime: string;
 
   totalAmountPaid?: number;
 
