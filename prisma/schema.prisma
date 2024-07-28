@@ -37,4 +37,6 @@ model Bookings {
   weekdayMassTime String?
   createdBy       CreatedBy
   createdAt       DateTime @default(now())
+
+  @@index(fields: [startDate, endDate, id])
 }

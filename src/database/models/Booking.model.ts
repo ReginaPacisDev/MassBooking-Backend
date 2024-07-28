@@ -1,4 +1,16 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  createIndexDecorator,
+} from 'sequelize-typescript';
+
+const StartDateIndex = createIndexDecorator();
+
+const EndDateIndex = createIndexDecorator();
+
+const IdIndex = createIndexDecorator();
 
 @Table
 export class Booking extends Model {
@@ -8,6 +20,7 @@ export class Booking extends Model {
     autoIncrement: true,
     primaryKey: true,
   })
+  @IdIndex
   id: number;
 
   @Column({
@@ -26,12 +39,14 @@ export class Booking extends Model {
     type: DataType.INTEGER,
     allowNull: false,
   })
+  @StartDateIndex
   startDate: number;
 
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
+  @EndDateIndex
   endDate: number;
 
   @Column({
