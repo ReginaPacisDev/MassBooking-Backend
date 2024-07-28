@@ -4,6 +4,7 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -41,13 +42,13 @@ class CreateBookingDto {
   @IsString()
   bookedBy: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  sundayMassTime: string;
+  sundayMassTime?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  weekdayMassTime: string;
+  weekdayMassTime?: string;
 }
 
 export class CreateBookingsDto {
