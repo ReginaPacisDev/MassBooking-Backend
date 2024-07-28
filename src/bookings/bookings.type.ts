@@ -1,6 +1,7 @@
 import { Bookings as PrismaBooking } from '@prisma/client';
 import { Booking as SequelizeBooking } from '../database';
 import { RangeTypes } from './helpers';
+import { CreatedBy } from './helpers/enums';
 
 export interface Booking {
   name: string;
@@ -13,6 +14,7 @@ export interface Booking {
   bookedBy: string;
   weekdayMassTime?: string;
   sundayMassTime?: string;
+  createdBy: CreatedBy;
 }
 
 export interface CreateBookingResponse {

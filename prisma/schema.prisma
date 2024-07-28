@@ -17,6 +17,11 @@ model User {
   isSuperAdmin  Boolean? @default(false)
 }
 
+enum CreatedBy {
+  User
+  Admin
+}
+
 model Bookings {
   id            Int     @default(autoincrement()) @id
   name            String
@@ -30,5 +35,6 @@ model Bookings {
   uniqueBookingID String
   sundayMassTime  String?
   weekdayMassTime String?
+  createdBy       CreatedBy
   createdAt       DateTime @default(now())
 }

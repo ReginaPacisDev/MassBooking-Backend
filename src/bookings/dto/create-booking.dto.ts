@@ -2,12 +2,14 @@ import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
+import { CreatedBy } from '../helpers/enums';
 
 class CreateBookingDto {
   @IsNotEmpty()
@@ -49,6 +51,9 @@ class CreateBookingDto {
   @IsOptional()
   @IsString()
   weekdayMassTime?: string;
+
+  @IsEnum(CreatedBy)
+  createdBy: CreatedBy;
 }
 
 export class CreateBookingsDto {
