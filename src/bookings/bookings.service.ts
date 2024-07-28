@@ -98,6 +98,7 @@ export class BookingsService {
     const {
       bookedBy: { field: bookedBy },
       uniqueBookingID: { field: uniqueBookingID },
+      createdBy: { field: createdBy },
     } = SequelizeBooking.getAttributes();
 
     const amountPaid: ProjectionAlias = [
@@ -111,7 +112,7 @@ export class BookingsService {
     ];
 
     const bookings = await this.bookingRepository.findAll({
-      attributes: [bookedBy, amountPaid, totalMassesBooked],
+      attributes: [bookedBy, amountPaid, totalMassesBooked, createdBy],
       where: {
         ...generateSequelizeWhereClause(restOfParams),
       },
