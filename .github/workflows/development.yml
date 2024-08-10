@@ -28,7 +28,7 @@ jobs:
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: source /home/regilwdi/nodevenv/api.reginapaciscc.org/20/bin/activate && 
-                    cd /home/regilwdi/api.reginapaciscc.org
+                    cd /home/regilwdi/api.reginapaciscc.org &&
                     npm run migrate:deploy
           host: ${{ secrets.MASSBOOKING_SITE_SERVER }}
           username: ${{ secrets.MASSBOOKING_SITE_USER }}
