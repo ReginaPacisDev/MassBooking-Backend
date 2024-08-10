@@ -29,6 +29,7 @@ jobs:
         with:
           command: source /home/regilwdi/nodevenv/api.reginapaciscc.org/20/bin/activate && 
                     cd /home/regilwdi/api.reginapaciscc.org &&
+                    npm install &&
                     npm run migrate:deploy
           host: ${{ secrets.MASSBOOKING_SITE_SERVER }}
           username: ${{ secrets.MASSBOOKING_SITE_USER }}
