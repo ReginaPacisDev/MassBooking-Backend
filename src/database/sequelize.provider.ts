@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize-typescript';
-import { Booking } from './models';
+import { Booking, User } from './models';
 
 export const databaseProviders = [
   {
@@ -13,7 +13,7 @@ export const databaseProviders = [
         password: process.env.DB_PASSWORD,
         database: process.env.DB,
       });
-      sequelize.addModels([Booking]);
+      sequelize.addModels([Booking, User]);
       await sequelize.sync();
       return sequelize;
     },

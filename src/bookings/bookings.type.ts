@@ -1,4 +1,3 @@
-import { Bookings as PrismaBooking } from '@prisma/client';
 import { Booking as SequelizeBooking } from '../database';
 import { RangeTypes } from './helpers';
 import { CreatedBy } from './helpers/enums';
@@ -33,7 +32,7 @@ export interface Stats {
 }
 
 export interface BookingsResponse {
-  bookings: PrismaBooking[];
+  bookings: SequelizeBooking[];
   total: number;
 }
 

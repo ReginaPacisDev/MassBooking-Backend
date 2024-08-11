@@ -1,10 +1,8 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
-import { Prisma } from '@prisma/client';
-import { Bookings as PrismaBooking } from '@prisma/client';
 import { literal, fn, col, ProjectionAlias } from 'sequelize';
 
-import { Booking as SequelizeBooking, PrismaService } from '../database';
+import { Booking as SequelizeBooking } from '../database';
 import {
   BOOKINGS_REPOSITORY,
   Booking,
@@ -13,12 +11,15 @@ import {
   GetBookings,
   Stats,
 } from './bookings.type';
-import { generateWhereClause, generateSequelizeWhereClause } from './helpers';
+import {
+  generateBookingsWhereClause,
+  generateSequelizeWhereClause,
+  RangeTypes,
+} from './helpers';
 
 @Injectable()
 export class BookingsService {
   constructor(
-    private prisma: PrismaService,
     @Inject(BOOKINGS_REPOSITORY)
     private bookingRepository: typeof SequelizeBooking,
   ) {}
@@ -36,7 +37,7 @@ export class BookingsService {
       uniqueBookingID,
     }));
 
-    await this.prisma.bookings.createMany({ data: normalizedBookings });
+    await this.bookingRepository.bulkCreate(normalizedBookings);
 
     return {
       amountPaid: totalAmountPaid,
@@ -49,22 +50,17 @@ export class BookingsService {
   async getBookings(params: GetBookings): Promise<BookingsResponse> {
     const { skip, take, ...restOfParams } = params;
 
-    const bookings = await this.prisma.bookings.findMany({
-      orderBy: [
-        {
-          createdAt: 'desc',
-        },
-      ],
+    const bookings = await this.bookingRepository.findAll({
+      order: [['createdAt', 'DESC']],
       where: {
-        ...generateWhereClause(restOfParams),
+        ...generateBookingsWhereClause(restOfParams),
       },
-      ...(skip && { skip: Number(skip) }),
-      ...(take && { take: Number(take) }),
+      ...(skip && { offset: Number(skip) }),
+      ...(take && { limit: Number(take) }),
+      raw: true,
     });
 
-    const count = await this.getBookingsCount(
-      generateWhereClause(restOfParams),
-    );
+    const count = await this.getBookingsCount(restOfParams);
 
     return {
       bookings,
@@ -72,11 +68,12 @@ export class BookingsService {
     };
   }
 
-  async getBooking(id: string): Promise<PrismaBooking> {
-    const booking = await this.prisma.bookings.findFirst({
+  async getBooking(id: string): Promise<SequelizeBooking> {
+    const booking = await this.bookingRepository.findOne({
       where: {
         id: Number(id),
       },
+      raw: true,
     });
 
     if (!booking) {
@@ -86,8 +83,10 @@ export class BookingsService {
     return booking;
   }
 
-  async getBookingsCount(where?: Prisma.BookingsWhereInput): Promise<number> {
-    const count = await this.prisma.bookings.count({ where });
+  async getBookingsCount(where?: RangeTypes): Promise<number> {
+    const count = await this.bookingRepository.count(
+      generateBookingsWhereClause(where),
+    );
 
     return count;
   }

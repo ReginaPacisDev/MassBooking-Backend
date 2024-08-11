@@ -5,8 +5,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LocalStrategy } from './strategies/local.strategy';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { PrismaService } from '../database';
-import { UsersService } from '../user';
+import { UsersService, USERS_REPOSITORY } from '../user';
+import { User } from '../database';
 
 @Module({
   imports: [
@@ -26,8 +26,11 @@ import { UsersService } from '../user';
     AuthService,
     LocalStrategy,
     JwtStrategy,
-    PrismaService,
     UsersService,
+    {
+      provide: USERS_REPOSITORY,
+      useValue: User,
+    },
   ],
   exports: [],
 })

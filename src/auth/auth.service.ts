@@ -1,26 +1,32 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { Prisma, User } from '@prisma/client';
 
-import { PrismaService } from '../database';
+import { User } from '../database';
 import { Login } from './auth.types';
 import { UsersService } from '../user/users.service';
+import { USERS_REPOSITORY } from '../user/user.types';
+import { CreateUserDto } from './dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    private prisma: PrismaService,
+    @Inject(USERS_REPOSITORY)
+    private usersRepository: typeof User,
     private userService: UsersService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<User> {
-    const user: User = await this.prisma.user.findFirst({ where: { email } });
+    const user: User = await this.usersRepository.findOne({
+      where: { email },
+      raw: true,
+    });
 
     if (!user) {
       throw new NotFoundException('User not found');
@@ -49,7 +55,7 @@ export class AuthService {
     };
   }
 
-  async signup(data: Prisma.UserCreateInput): Promise<Login> {
+  async signup(data: CreateUserDto): Promise<Login> {
     const user = await this.userService.createUser({
       ...data,
       isSuperAdmin: true,

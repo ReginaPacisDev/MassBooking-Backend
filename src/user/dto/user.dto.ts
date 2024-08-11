@@ -4,3 +4,10 @@ export class UserDto {
   name: string;
   isSuperAdmin: string;
 }
+
+export interface CreateUserDto {
+  email: string;
+  name?: string;
+  isSuperAdmin?: boolean;
+  password: string;
+}
