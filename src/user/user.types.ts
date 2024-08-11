@@ -19,3 +19,5 @@ export interface User {
   email: string;
   isSuperAdmin: boolean;
 }
+
+export const USERS_REPOSITORY = 'USERS_REPOSITORY';

@@ -1,23 +1,29 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma, User as PrismaUser } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 
-import { PrismaService } from '../database';
+import { User as SequelizeUser } from '../database';
 import { handleSendMail } from './helpers';
 import { AdminCreateUser, GetUser, UpdateUser, User } from './user.types';
+import { USERS_REPOSITORY } from './user.types';
+import { CreateUserDto } from './dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    @Inject(USERS_REPOSITORY)
+    private usersRepository: typeof SequelizeUser,
+  ) {}
 
-  async createUser(data: Prisma.UserCreateInput): Promise<PrismaUser> {
-    const existingUser = await this.prisma.user.findFirst({
+  async createUser(data: CreateUserDto): Promise<SequelizeUser> {
+    const existingUser = await this.usersRepository.findOne({
       where: { email: data.email },
+      raw: true,
     });
 
     if (existingUser) {
@@ -29,17 +35,16 @@ export class UsersService {
       Number(process.env.BCRYPT_SALT_OR_ROUNDS),
     );
 
-    return await this.prisma.user.create({
-      data: {
-        ...data,
-        password,
-      },
+    return await this.usersRepository.create({
+      ...data,
+      password,
     });
   }
 
-  async resetPassword(email: string, password): Promise<void> {
-    const existingUser = await this.prisma.user.findFirst({
+  async resetPassword(email: string, password: string): Promise<void> {
+    const existingUser = await this.usersRepository.findOne({
       where: { email },
+      raw: true,
     });
 
     if (!existingUser) {
@@ -51,14 +56,14 @@ export class UsersService {
       Number(process.env.BCRYPT_SALT_OR_ROUNDS),
     );
 
-    await this.prisma.user.update({
-      where: {
-        email,
+    await this.usersRepository.update(
+      { password: hashedPassword },
+      {
+        where: {
+          email,
+        },
       },
-      data: {
-        password: hashedPassword,
-      },
-    });
+    );
   }
 
   async sendPasswordResetLink(email): Promise<void> {
@@ -92,10 +97,11 @@ export class UsersService {
   }
 
   async getUser(data: GetUser): Promise<User> {
-    const user = await this.prisma.user.findFirst({
+    const user = await this.usersRepository.findOne({
       where: {
         ...data,
       },
+      raw: true,
     });
 
     if (!user) {
@@ -111,8 +117,9 @@ export class UsersService {
   }
 
   async updateUser(userId: number, data: UpdateUser): Promise<void> {
-    const user = await this.prisma.user.findFirst({
+    const user = await this.usersRepository.findOne({
       where: { id: userId },
+      raw: true,
     });
 
     if (!user) {
@@ -120,8 +127,9 @@ export class UsersService {
     }
 
     if (data.email) {
-      const existingUser = await this.prisma.user.findFirst({
+      const existingUser = await this.usersRepository.findOne({
         where: { email: data.email },
+        raw: true,
       });
 
       if (existingUser && existingUser.id !== userId) {
@@ -140,13 +148,13 @@ export class UsersService {
       );
     }
 
-    await this.prisma.user.update({
-      where: {
-        id: userId,
+    await this.usersRepository.update(
+      { ...updateObject },
+      {
+        where: {
+          id: userId,
+        },
       },
-      data: {
-        ...updateObject,
-      },
-    });
+    );
   }
 }

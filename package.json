@@ -18,9 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "migrate:deploy": "prisma migrate deploy && nest build",
-    "migrate:status": "prisma migrate status",
-    "generate": "prisma generate"
+    "migrate": "sequelize-cli db:migrate",
+    "migrate:deploy": "npm run migrate && npm run build"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
@@ -41,6 +40,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0",
     "sequelize": "^6.37.1",
+    "sequelize-cli": "^6.3.0",
     "sequelize-typescript": "^2.1.6",
     "uuid": "^9.0.1"
   },
