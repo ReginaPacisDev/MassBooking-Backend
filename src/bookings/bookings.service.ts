@@ -16,6 +16,7 @@ import {
   generateSequelizeWhereClause,
   RangeTypes,
 } from './helpers';
+import { handleSendMail } from '../user/helpers';
 
 @Injectable()
 export class BookingsService {
@@ -23,6 +24,13 @@ export class BookingsService {
     @Inject(BOOKINGS_REPOSITORY)
     private bookingRepository: typeof SequelizeBooking,
   ) {}
+
+  private async sendBookingCreatedMail(userEmail, adminEmail): Promise<void> {
+    const subject = 'New Mass Booking';
+    const text = `A new booking was successfully created for user: ${userEmail}`;
+
+    await handleSendMail({ subject, text, email: adminEmail });
+  }
 
   async createBooking(bookings: Booking[]): Promise<CreateBookingResponse> {
     const totalAmountPaid = bookings.reduce(
@@ -38,6 +46,11 @@ export class BookingsService {
     }));
 
     await this.bookingRepository.bulkCreate(normalizedBookings);
+
+    await this.sendBookingCreatedMail(
+      normalizedBookings[0].email,
+      process.env.USER_GMAIL_ACCOUNT,
+    );
 
     return {
       amountPaid: totalAmountPaid,
