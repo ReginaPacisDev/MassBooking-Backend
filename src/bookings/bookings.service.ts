@@ -25,9 +25,9 @@ export class BookingsService {
     private bookingRepository: typeof SequelizeBooking,
   ) {}
 
-  private async sendBookingCreatedMail(userEmail, adminEmail): Promise<void> {
+  private async sendBookingCreatedMail(bookedBy, adminEmail): Promise<void> {
     const subject = 'New Mass Booking';
-    const text = `A new booking was successfully created for user: ${userEmail}`;
+    const text = `A new Mass booking request has been made by ${bookedBy}. Login to the admin account to manage the booking`;
 
     await handleSendMail({ subject, text, email: adminEmail });
   }
@@ -48,7 +48,7 @@ export class BookingsService {
     await this.bookingRepository.bulkCreate(normalizedBookings);
 
     await this.sendBookingCreatedMail(
-      normalizedBookings[0].email,
+      normalizedBookings[0].bookedBy,
       process.env.ADMIN_EMAIL,
     );
 
