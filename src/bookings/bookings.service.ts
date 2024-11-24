@@ -49,7 +49,7 @@ export class BookingsService {
 
     await this.sendBookingCreatedMail(
       normalizedBookings[0].email,
-      process.env.USER_GMAIL_ACCOUNT,
+      process.env.ADMIN_EMAIL,
     );
 
     return {
