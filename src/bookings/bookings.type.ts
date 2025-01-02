@@ -13,6 +13,8 @@ export interface Booking {
   bookedBy: string;
   weekdayMassTime?: string;
   sundayMassTime?: string;
+  tuesdayMassTime?: string;
+  saturdayMassTime?: string;
   createdBy: CreatedBy;
 }
 
