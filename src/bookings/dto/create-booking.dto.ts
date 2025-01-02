@@ -52,6 +52,14 @@ class CreateBookingDto {
   @IsString()
   weekdayMassTime?: string;
 
+  @IsOptional()
+  @IsString()
+  tuesdayMassTime?: string;
+
+  @IsOptional()
+  @IsString()
+  saturdayMassTime?: string;
+
   @IsEnum(CreatedBy)
   createdBy: CreatedBy;
 }
