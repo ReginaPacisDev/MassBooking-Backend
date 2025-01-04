@@ -170,6 +170,6 @@ export class BookingsService {
   }
 
   async deleteBookings(): Promise<void> {
-    await this.bookingRepository.destroy({});
+    await this.bookingRepository.destroy({ where: {} });
   }
 }
