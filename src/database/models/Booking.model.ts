@@ -89,6 +89,18 @@ export class Booking extends Model {
   weekdayMassTime?: string;
 
   @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  saturdayMassTime?: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  tuesdayMassTime?: string;
+
+  @Column({
     type: DataType.ENUM('User', 'Admin'),
     allowNull: false,
   })
