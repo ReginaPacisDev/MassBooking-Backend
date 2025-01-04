@@ -97,9 +97,11 @@ export class BookingsService {
   }
 
   async getBookingsCount(where?: RangeTypes): Promise<number> {
-    const count = await this.bookingRepository.count(
-      generateBookingsWhereClause(where),
-    );
+    const count = await this.bookingRepository.count({
+      where: {
+        ...generateBookingsWhereClause(where),
+      },
+    });
 
     return count;
   }
