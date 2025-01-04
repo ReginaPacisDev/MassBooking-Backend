@@ -168,4 +168,8 @@ export class BookingsService {
       total: total.length,
     };
   }
+
+  async deleteBookings(): Promise<void> {
+    await this.bookingRepository.destroy({});
+  }
 }
