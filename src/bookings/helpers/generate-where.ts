@@ -44,6 +44,43 @@ export const generateSequelizeWhereClause = ({ type, date }: RangeTypes) => {
   };
 };
 
+export const generateDateRangeWhereObject = (startDate, endDate, format) => {
+  return {
+    [Op.or as symbol]: [
+      {
+        startDate: {
+          [Op.between as symbol]: [
+            moment(startDate, format).startOf('day').utc(true).unix(),
+            moment(endDate, format).startOf('day').utc(true).unix(),
+          ],
+        },
+      },
+      {
+        endDate: {
+          [Op.between as symbol]: [
+            moment(startDate, format).startOf('day').utc(true).unix(),
+            moment(endDate, format).startOf('day').utc(true).unix(),
+          ],
+        },
+      },
+      {
+        startDate: {
+          [Op.lte as symbol]: moment(startDate, format)
+            .startOf('day')
+            .utc(true)
+            .unix(),
+        },
+        endDate: {
+          [Op.gte as symbol]: moment(endDate, format)
+            .startOf('day')
+            .utc(true)
+            .unix(),
+        },
+      },
+    ],
+  };
+};
+
 export const generateBookingsWhereClause = ({
   startDate,
   endDate,
@@ -55,66 +92,17 @@ export const generateBookingsWhereClause = ({
 
   return {
     ...(startDate && {
-      [Op.and as symbol]: [
-        {
-          startDate: {
-            [Op.lte as symbol]: moment(endDate, format)
-              .endOf('day')
-              .utc(true)
-              .unix(),
-          },
-        },
-        {
-          endDate: {
-            [Op.gte as symbol]: moment(startDate, format)
-              .startOf('day')
-              .utc(true)
-              .unix(),
-          },
-        },
-      ],
+      ...generateDateRangeWhereObject(startDate, endDate, format),
     }),
     ...(type && {
-      [Op.and as symbol]: [
-        {
-          startDate: {
-            [Op.lte as symbol]: moment()
-              .endOf(type)
-              .startOf('day')
-              .utc(true)
-              .unix(),
-          },
-        },
-        {
-          endDate: {
-            [Op.gte as symbol]: moment()
-              .startOf(type)
-              .startOf('day')
-              .utc(true)
-              .unix(),
-          },
-        },
-      ],
+      ...generateDateRangeWhereObject(
+        moment().startOf(type),
+        moment().endOf(type),
+        format,
+      ),
     }),
     ...(date && {
-      [Op.and as symbol]: [
-        {
-          startDate: {
-            [Op.lte as symbol]: moment(date, format)
-              .endOf('day')
-              .utc(true)
-              .unix(),
-          },
-        },
-        {
-          endDate: {
-            [Op.gte as symbol]: moment(date, format)
-              .startOf('day')
-              .utc(true)
-              .unix(),
-          },
-        },
-      ],
+      ...generateDateRangeWhereObject(date, date, format),
     }),
     ...(name && {
       [Op.or as symbol]: [
