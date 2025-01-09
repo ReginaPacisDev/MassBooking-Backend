@@ -53,6 +53,8 @@ export const generateBookingsWhereClause = ({
 }: RangeTypes) => {
   const format = 'DD-MM-YYYY';
 
+  const isSameDate = startDate && endDate && startDate === endDate;
+
   return {
     ...(startDate && {
       [Op.and as symbol]: [
@@ -66,10 +68,9 @@ export const generateBookingsWhereClause = ({
         },
         {
           endDate: {
-            [Op.gte as symbol]: moment(startDate, format)
-              .startOf('day')
-              .utc(true)
-              .unix(),
+            [Op.gte as symbol]: isSameDate
+              ? moment(startDate, format).endOf('day').utc(true).unix()
+              : moment(startDate, format).startOf('day').utc(true).unix(),
           },
         },
       ],
