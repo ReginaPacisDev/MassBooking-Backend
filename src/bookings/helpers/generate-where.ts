@@ -55,20 +55,24 @@ export const generateBookingsWhereClause = ({
 
   return {
     ...(startDate && {
-      startDate: {
-        [Op.gte as symbol]: moment(startDate, format)
-          .startOf('day')
-          .utc(true)
-          .unix(),
-      },
-    }),
-    ...(endDate && {
-      endDate: {
-        [Op.lte as symbol]: moment(endDate, format)
-          .endOf('day')
-          .utc(true)
-          .unix(),
-      },
+      [Op.and as symbol]: [
+        {
+          startDate: {
+            [Op.lte as symbol]: moment(endDate, format)
+              .startOf('day')
+              .utc(true)
+              .unix(),
+          },
+        },
+        {
+          endDate: {
+            [Op.gte as symbol]: moment(startDate, format)
+              .startOf('day')
+              .utc(true)
+              .unix(),
+          },
+        },
+      ],
     }),
     ...(type && {
       [Op.and as symbol]: [
