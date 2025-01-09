@@ -83,7 +83,7 @@ export class UsersService {
       password,
     });
 
-    const loginLink = `${process.env.REACT_APP_URL}/signin`;
+    const loginLink = `${process.env.REACT_APP_URL}admin/login`;
 
     const subject = 'Your Login Details';
 
