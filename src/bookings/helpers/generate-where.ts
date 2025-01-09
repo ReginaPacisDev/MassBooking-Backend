@@ -7,7 +7,22 @@ export interface RangeTypes {
   date?: number;
   type?: any;
   name?: string;
+  massTime?: string;
+  massIntention?: string;
 }
+
+export const massIntentions = [
+  'Birthday Thanksgiving',
+  'Child Thanksgiving',
+  'Wedding Anniversary Thanksgiving',
+  'Special Intentions',
+  "God's Blessings, Guidance and Protection",
+  "God's Mercy and Healing",
+  "Journey Mercies And God's Protection",
+  'Repose of the Souls Departed',
+  'Repose Of The Souls In Purgatory',
+  "God's Mercy, Intervention and Favour",
+];
 
 export const generateSequelizeWhereClause = ({ type, date }: RangeTypes) => {
   const format = 'DD-MM-YYYY';
@@ -87,6 +102,8 @@ export const generateBookingsWhereClause = ({
   type,
   date,
   name,
+  massTime,
+  massIntention,
 }: RangeTypes) => {
   const format = 'DD-MM-YYYY';
 
@@ -117,6 +134,29 @@ export const generateBookingsWhereClause = ({
           },
         },
       ],
+    }),
+    ...(massTime && {
+      [Op.or as symbol]: [
+        {
+          sundayMassTime: massTime,
+        },
+        {
+          saturdayMassTime: massTime,
+        },
+        {
+          tuesdayMassTime: massTime,
+        },
+        {
+          weekdayMassTime: massTime,
+        },
+      ],
+    }),
+    ...(massIntention && {
+      massIntention: massIntentions.includes(massIntention)
+        ? massIntention
+        : {
+            [Op.notIn as symbol]: massIntentions,
+          },
     }),
   };
 };

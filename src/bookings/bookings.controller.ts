@@ -49,6 +49,8 @@ export class BookingsController {
     @Query('type') type?: string,
     @Query('date') date?: number,
     @Query('name') name?: string,
+    @Query('massTime') massTime?: string,
+    @Query('massIntention') massIntention?: string,
   ): Promise<BookingsResponse> {
     return await this.bookingsService.getBookings({
       skip,
@@ -58,6 +60,8 @@ export class BookingsController {
       type,
       date,
       name,
+      massTime,
+      massIntention,
     });
   }
 
