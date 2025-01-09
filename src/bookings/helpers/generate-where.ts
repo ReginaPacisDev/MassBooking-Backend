@@ -59,7 +59,7 @@ export const generateBookingsWhereClause = ({
         {
           startDate: {
             [Op.lte as symbol]: moment(endDate, format)
-              .startOf('day')
+              .endOf('day')
               .utc(true)
               .unix(),
           },
