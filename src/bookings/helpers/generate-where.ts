@@ -125,12 +125,12 @@ export const generateBookingsWhereClause = ({
       [Op.or as symbol]: [
         {
           name: {
-            [Op.contains as symbol]: name,
+            [Op.like as symbol]: `%${name}%`,
           },
         },
         {
           bookedBy: {
-            [Op.contains as symbol]: name,
+            [Op.like as symbol]: `%${name}%`,
           },
         },
       ],
