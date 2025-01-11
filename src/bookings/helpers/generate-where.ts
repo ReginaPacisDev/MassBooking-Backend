@@ -33,6 +33,8 @@ export const generateSequelizeWhereClause = ({
 }: RangeTypes) => {
   const format = 'DD-MM-YYYY';
 
+  const isValidCreatedByValue = createdBy && createdBy.toString() !== 'All';
+
   return {
     ...(type && {
       [Op.and as symbol]: [
@@ -62,7 +64,7 @@ export const generateSequelizeWhereClause = ({
         },
       ],
     }),
-    ...(createdBy && {
+    ...(isValidCreatedByValue && {
       createdBy,
     }),
   };
