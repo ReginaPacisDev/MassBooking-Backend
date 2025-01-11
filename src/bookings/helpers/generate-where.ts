@@ -116,21 +116,30 @@ export const generateBookingsWhereClause = ({
 }: RangeTypes) => {
   const format = 'DD-MM-YYYY';
 
-  return {
-    ...(startDate && {
-      ...generateDateRangeWhereObject(startDate, endDate, format),
-    }),
-    ...(type && {
-      ...generateDateRangeWhereObject(
+  const whereConditions = [];
+
+  if (startDate) {
+    whereConditions.push(
+      generateDateRangeWhereObject(startDate, endDate, format),
+    );
+  }
+
+  if (type) {
+    whereConditions.push(
+      generateDateRangeWhereObject(
         moment().startOf(type),
         moment().endOf(type),
         format,
       ),
-    }),
-    ...(date && {
-      ...generateDateRangeWhereObject(date, date, format),
-    }),
-    ...(name && {
+    );
+  }
+
+  if (date) {
+    whereConditions.push(generateDateRangeWhereObject(date, date, format));
+  }
+
+  if (name) {
+    whereConditions.push({
       [Op.or as symbol]: [
         {
           name: {
@@ -143,8 +152,11 @@ export const generateBookingsWhereClause = ({
           },
         },
       ],
-    }),
-    ...(massTime && {
+    });
+  }
+
+  if (massTime) {
+    whereConditions.push({
       [Op.or as symbol]: [
         {
           sundayMassTime: massTime,
@@ -159,13 +171,20 @@ export const generateBookingsWhereClause = ({
           weekdayMassTime: massTime,
         },
       ],
-    }),
-    ...(massIntention && {
+    });
+  }
+
+  if (massIntention) {
+    whereConditions.push({
       massIntention: massIntentions.includes(massIntention)
         ? massIntention
         : {
-            [Op.notIn as symbol]: massIntentions,
+            [Op.notIn]: massIntentions,
           },
-    }),
+    });
+  }
+
+  return {
+    [Op.and as symbol]: whereConditions,
   };
 };
