@@ -6,6 +6,7 @@ dotenv.config();
 module.exports = {
   development: {
     dialect: 'mysql',
+    timezone: '+00:00',
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
     username: process.env.DB_USER,
@@ -15,6 +16,7 @@ module.exports = {
   production: {
     dialect: 'mysql',
     host: process.env.DB_HOST,
+    timezone: '+00:00',
     port: Number(process.env.DB_PORT),
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,

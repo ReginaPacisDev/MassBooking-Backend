@@ -8,6 +8,7 @@ import {
   Stats,
 } from './bookings.type';
 import { Booking } from '../database';
+import { CreatedBy } from './helpers/enums';
 
 @Controller('bookings')
 export class BookingsController {
@@ -27,6 +28,7 @@ export class BookingsController {
     @Query('endDate') endDate?: number,
     @Query('type') type?: string,
     @Query('date') date?: number,
+    @Query('createdBy') createdBy?: CreatedBy,
     @Query('skip') skip?: string,
     @Query('limit') limit?: string,
   ): Promise<Stats> {
@@ -34,6 +36,7 @@ export class BookingsController {
       startDate,
       endDate,
       type,
+      createdBy,
       date,
       skip,
       take: limit,

@@ -1,5 +1,6 @@
 import * as moment from 'moment';
 import { Op } from 'sequelize';
+import { CreatedBy } from './enums';
 
 export interface RangeTypes {
   startDate?: number;
@@ -9,6 +10,7 @@ export interface RangeTypes {
   name?: string;
   massTime?: string;
   massIntention?: string;
+  createdBy?: CreatedBy;
 }
 
 export const massIntentions = [
@@ -24,7 +26,11 @@ export const massIntentions = [
   "God's Mercy, Intervention and Favour",
 ];
 
-export const generateSequelizeWhereClause = ({ type, date }: RangeTypes) => {
+export const generateSequelizeWhereClause = ({
+  type,
+  date,
+  createdBy,
+}: RangeTypes) => {
   const format = 'DD-MM-YYYY';
 
   return {
@@ -55,6 +61,9 @@ export const generateSequelizeWhereClause = ({ type, date }: RangeTypes) => {
           },
         },
       ],
+    }),
+    ...(createdBy && {
+      createdBy,
     }),
   };
 };
