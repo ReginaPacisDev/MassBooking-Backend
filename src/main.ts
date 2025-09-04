@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import helmet from 'helmet';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './filters';
 
 async function bootstrap() {
@@ -18,6 +19,8 @@ async function bootstrap() {
       forbidUnknownValues: true,
     }),
   );
+
+  app.use(helmet());
 
   app.useGlobalFilters(new HttpExceptionFilter());
 
