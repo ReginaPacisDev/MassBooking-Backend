@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: ['https://massbookingreginapaciscc.org/'],
+    origin: ['https://massbookingreginapaciscc.org'],
     credentials: true,
   });
 
