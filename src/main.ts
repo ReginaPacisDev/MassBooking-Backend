@@ -6,7 +6,10 @@ import { HttpExceptionFilter } from './filters';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors();
+  app.enableCors({
+    origin: ['https://massbookingreginapaciscc.org/'],
+    credentials: true,
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
